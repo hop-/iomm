@@ -30,9 +30,19 @@ impl Server {
         //};
     }
 
-    async fn handle_connection(conn: &dyn Conn) -> Result<(), Error> {
+    async fn handle_connection(&self, conn: &dyn Conn) -> Result<(), Error> {
         // TODO: do handling
+        let conn_type = self.handshake(conn).await;
 
         Ok(())
+    }
+
+    async fn handshake(&self, conn: &dyn Conn) -> Option<()> {
+        let mut connection_option_message = conn.recv().await;
+
+        for b in connection_option_message.body_as_map() {
+        }
+
+        None
     }
 }
