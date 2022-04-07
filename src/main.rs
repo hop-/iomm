@@ -39,7 +39,7 @@ fn get_config_var_map() -> Vec<Attribute> {
 
 fn main() {
     // Start
-    println!("Hi, Iomm is here");
+    println!("Hi, Iomm is here.");
     println!("----------------");
 
     // Initializing config
@@ -66,5 +66,5 @@ fn main() {
 
     // Good bye
     println!("----------------");
-    println!("Bye");
+    println!("Bye.");
 }
