@@ -1,5 +1,7 @@
 use crate::net::conn::Conn;
+use async_trait::async_trait;
 
+#[async_trait]
 pub trait Listener {
-    fn listen(port: u16) -> dyn Conn;
+    async fn listen(&self, port: u16) -> Box<dyn Conn>;
 }
