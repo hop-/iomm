@@ -3,10 +3,10 @@ use crate::config::{
     value::{Value, ValueType},
 };
 
-use crate::server::Server;
+use crate::app::server::Server;
 
 mod log;
-mod server;
+mod app;
 mod net;
 mod core;
 mod config;
@@ -50,6 +50,7 @@ fn main() {
                 println!("{}", e);
             };
 
+            // Panic?
             panic!("failed config init");
         },
     };

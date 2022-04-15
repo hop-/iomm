@@ -1,10 +1,17 @@
-use crate::net::{
-    listener::Listener,
-    conn::Conn,
-    quic,
+use crate::{
+    app::connections::{
+        Connection,
+        Consumer,
+        Producer,
+    },
+    error::Error,
+    net::{
+        listener::Listener,
+        conn::Conn,
+        quic,
+    },
 };
 
-use crate::error::Error;
 
 use log::info;
 
@@ -39,26 +46,28 @@ impl Server {
     }
 
     async fn handle_connection(&self, conn: Box<dyn Conn>) -> Result<(), Error> {
+        // TODO:: use better return
+        let conn= self.handshake(conn).await;
         // TODO: handle
-        let conn_type = self.handshake(conn).await;
 
         Ok(())
     }
 
-    async fn handshake(&self, conn: Box<dyn Conn>) -> Option<String> {
+    async fn handshake(&self, conn: Box<dyn Conn>) -> Option<Connection> {
         let mut options_message = conn.recv().await;
         let options = options_message.body_as_map();
-        // TODO: use enum?
-        let connection_type: String;
 
+        let conn: Connection;
+
+        // Defining connection type
         match options["type"].as_str() {
-            "consumer" => connection_type = "consumer".to_string(),
-            "producer" => connection_type = "producer".to_string(),
+            "consumer" => conn = Connection::Consumer(Consumer::new()),
+            "producer" => conn = Connection::Producer(Producer::new()),
             _ => return None
         }
 
         // TODO: use other options
 
-        Some(connection_type)
+        Some(conn)
     }
 }
