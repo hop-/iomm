@@ -3,12 +3,15 @@ use crate::{
     net::message::Message,
 };
 use async_trait::async_trait;
+use quinn;
 
-pub struct Conn {}
+pub struct Conn {
+    conn: quinn::Connecting,
+}
 
 impl Conn {
-    pub fn new() -> Conn {
-        Conn {}
+    pub fn new(conn: quinn::Connecting ) -> Conn {
+        Conn {conn: conn}
     }
 }
 

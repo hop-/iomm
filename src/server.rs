@@ -23,13 +23,18 @@ impl Server {
     #[tokio::main]
     pub async fn serve(&self) {
         info!("Starting server on port {}", self.port);
-        let listener = quic::listener::Listener::new();
+        let mut listener = quic::listener::Listener::new();
 
         loop {
-            let conn = listener.listen(self.port).await;
-            // TODO:: Do things with conn
-            // handle errors
-            self.handle_connection(conn).await.unwrap();
+            match listener.listen(self.port).await {
+                Ok(conn) => {
+                    // TODO: Do things with conn
+                    self.handle_connection(conn).await.unwrap();
+                },
+                Err(err) => {
+                    // TODO: handle errors
+                },
+            }
         };
     }
 
@@ -40,12 +45,20 @@ impl Server {
         Ok(())
     }
 
-    async fn handshake(&self, conn: Box<dyn Conn>) -> Option<()> {
-        let mut connection_option_message = conn.recv().await;
+    async fn handshake(&self, conn: Box<dyn Conn>) -> Option<String> {
+        let mut options_message = conn.recv().await;
+        let options = options_message.body_as_map();
+        // TODO: use enum?
+        let connection_type: String;
 
-        for b in connection_option_message.body_as_map() {
+        match options["type"].as_str() {
+            "consumer" => connection_type = "consumer".to_string(),
+            "producer" => connection_type = "producer".to_string(),
+            _ => return None
         }
 
-        None
+        // TODO: use other options
+
+        Some(connection_type)
     }
 }
