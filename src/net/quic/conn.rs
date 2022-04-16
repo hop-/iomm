@@ -4,13 +4,17 @@ use crate::{
 };
 use async_trait::async_trait;
 use quinn;
+use std::{
+    error::Error,
+    net::SocketAddr
+};
 
 pub struct Conn {
-    conn: quinn::Connecting,
+    conn: quinn::NewConnection,
 }
 
 impl Conn {
-    pub fn new(conn: quinn::Connecting ) -> Conn {
+    pub fn new(conn: quinn::NewConnection ) -> Conn {
         Conn {conn: conn}
     }
 }
@@ -18,21 +22,21 @@ impl Conn {
 #[async_trait]
 impl net::conn::Conn for Conn {
     
-    async fn send(&self, msg: &Message) {
+    async fn send(&self, msg: &Message) -> Result<(), Box<dyn Error>> {
         // TODO: implement send
+        todo!()
     }
     
-    async fn recv(&self) -> Message {
+    async fn recv(&self) -> Result<Message, Box<dyn Error>> {
         // TODO: implement recieve
-        Message::new("not-imlemented".to_string(), [].to_vec())
+        todo!()
     }
 
     fn close(&self) {
         // TODO: close
     }
     
-    fn get_ip(&self) -> String {
-        // TODO: get_ip
-        "not.implemented".to_string()
+    fn addr(&self) -> SocketAddr {
+        self.conn.connection.remote_address()
     }
 }

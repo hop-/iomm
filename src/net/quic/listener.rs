@@ -66,8 +66,10 @@ impl net::listener::Listener for Listener {
             self.port = port;
         }
 
+        // TODO: maybe better to use "?"
         match self.incoming.as_mut().unwrap().next().await {
-            Some(conn) => {
+            Some(cing) => {
+                let conn = cing.await?; 
                 return Ok(Box::new(Conn::new(conn)));
             },
             None => {

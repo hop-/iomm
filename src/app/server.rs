@@ -16,7 +16,6 @@ use std::{
     error::Error,
 };
 
-
 use log::info;
 
 pub struct Server {
@@ -39,6 +38,7 @@ impl Server {
         loop {
             match listener.listen(self.port).await {
                 Ok(conn) => {
+                    info!("New Connection estblished");
                     // TODO: Do things with conn
                     self.handle_connection(conn).await.unwrap();
                 },
@@ -55,15 +55,17 @@ impl Server {
 
         // TODO: handle conn
         //match conn {
-        //    Connection::Consumer(c) => {},
-        //    Connection::Producer(p) => {},
+        //    Connection::Consumer(c) => {
+        //},
+        //    Connection::Producer(p) => {
+        //},
         //}
 
         Ok(())
     }
 
     async fn handshake(&self, conn: Box<dyn Conn>) -> Result<Connection, Box<dyn Error>> {
-        let mut options_message = conn.recv().await;
+        let mut options_message = conn.recv().await?;
         let options = options_message.body_as_map();
 
         let c: Connection;
