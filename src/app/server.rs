@@ -4,12 +4,16 @@ use crate::{
         Consumer,
         Producer,
     },
-    error::Error,
+    error::TextError,
     net::{
         listener::Listener,
         conn::Conn,
         quic,
     },
+};
+
+use std::{
+    error::Error,
 };
 
 
@@ -40,34 +44,43 @@ impl Server {
                 },
                 Err(err) => {
                     // TODO: handle errors
+                    todo!()
                 },
             }
         };
     }
 
-    async fn handle_connection(&self, conn: Box<dyn Conn>) -> Result<(), Error> {
-        // TODO:: use better return
-        let conn= self.handshake(conn).await;
-        // TODO: handle
+    async fn handle_connection(&self, conn: Box<dyn Conn>) -> Result<(), Box<dyn Error>> {
+        let conn= self.handshake(conn).await?;
+
+        // TODO: handle conn
+        //match conn {
+        //    Connection::Consumer(c) => {},
+        //    Connection::Producer(p) => {},
+        //}
 
         Ok(())
     }
 
-    async fn handshake(&self, conn: Box<dyn Conn>) -> Option<Connection> {
+    async fn handshake(&self, conn: Box<dyn Conn>) -> Result<Connection, Box<dyn Error>> {
         let mut options_message = conn.recv().await;
         let options = options_message.body_as_map();
 
-        let conn: Connection;
+        let c: Connection;
 
         // Defining connection type
         match options["type"].as_str() {
-            "consumer" => conn = Connection::Consumer(Consumer::new()),
-            "producer" => conn = Connection::Producer(Producer::new()),
-            _ => return None
+            "consumer" => {
+                c = Connection::Consumer(Consumer::new(conn));
+            },
+            "producer" => {
+                c = Connection::Producer(Producer::new(conn));
+            },
+            _ => return Err(Box::new(TextError::new("Recevied connection doen't fit requirements"))),
         }
 
         // TODO: use other options
 
-        Some(conn)
+        Ok(c)
     }
 }
