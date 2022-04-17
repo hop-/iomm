@@ -2,6 +2,7 @@ use crate::{
     net,
     net::message::Message,
 };
+
 use async_trait::async_trait;
 use quinn;
 use std::{
@@ -11,11 +12,17 @@ use std::{
 
 pub struct Conn {
     conn: quinn::NewConnection,
+    send_stream: quinn::SendStream,
+    recv_stream: quinn::RecvStream,
 }
 
 impl Conn {
-    pub fn new(conn: quinn::NewConnection ) -> Conn {
-        Conn {conn: conn}
+    pub fn new(conn: quinn::NewConnection, (send, recv): (quinn::SendStream, quinn::RecvStream) ) -> Conn {
+        Conn {
+            conn: conn,
+            send_stream: send,
+            recv_stream: recv,
+        }
     }
 }
 

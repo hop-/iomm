@@ -66,25 +66,27 @@ impl net::listener::Listener for Listener {
             self.port = port;
         }
 
-        // TODO: maybe better to use "?"
         match self.incoming.as_mut().unwrap().next().await {
             Some(cing) => {
-                let conn = cing.await?; 
-                return Ok(Box::new(Conn::new(conn)));
+                let mut conn = cing.await?; 
+
+                match conn.bi_streams.next().await {
+                    Some(stream) => {
+                        match stream {
+                            Ok(s) => Ok(Box::new(Conn::new(conn, s))),
+                            Err(e) => Err(Box::new(e)),
+                        }
+                    },
+                    None => {
+                        // TODO: failed to get streams
+                        todo!()
+                    },
+                }
             },
             None => {
+                // TODO: failed connecting
                 todo!()
             }
         }
-        //match &self.incoming {
-        //    Some(mut incoming) => {
-        //        let conn = incoming.next().await;
-        //        return Ok(Box::new(Conn::new()));
-        //    },
-        //    None => {
-        //        // TODO: handle error?
-        //        todo!()
-        //    },
-        //}
     }
 }
