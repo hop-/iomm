@@ -64,7 +64,7 @@ impl Server {
         Ok(())
     }
 
-    async fn handshake(&self, conn: Box<dyn Conn>) -> Result<Connection, Box<dyn Error>> {
+    async fn handshake(&self, mut conn: Box<dyn Conn>) -> Result<Connection, Box<dyn Error>> {
         let mut options_message = conn.recv().await?;
         let options = options_message.body_as_map();
 

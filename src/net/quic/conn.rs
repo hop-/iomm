@@ -1,13 +1,14 @@
 use crate::{
     net,
     net::message::Message,
+    error,
 };
 
 use async_trait::async_trait;
 use quinn;
 use std::{
     error::Error,
-    net::SocketAddr
+    net::SocketAddr,
 };
 
 pub struct Conn {
@@ -29,14 +30,24 @@ impl Conn {
 #[async_trait]
 impl net::conn::Conn for Conn {
     
-    async fn send(&self, msg: &Message) -> Result<(), Box<dyn Error>> {
-        // TODO: implement send
-        todo!()
+    async fn send(&mut self, message: &Message) -> Result<(), Box<dyn Error>> {
+        let message = message.serialize()?;
+        self.send_stream.write_chunk(message).await?;
+
+        Ok(())
     }
     
-    async fn recv(&self) -> Result<Message, Box<dyn Error>> {
-        // TODO: implement recieve
-        todo!()
+    async fn recv(&mut self) -> Result<Message, Box<dyn Error>> {
+        let message = self.recv_stream.read_chunk(32 * 1024, false).await?;
+
+        match message {
+            Some(message) => {
+                Ok(Message::deserialize(&message.bytes)?)
+            },
+            None => {
+                Err(Box::new(error::Error {}))
+            }
+        }
     }
 
     fn close(&self) {

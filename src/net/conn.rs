@@ -7,8 +7,8 @@ use std::{
 
 #[async_trait]
 pub trait Conn {
-    async fn send(&self, msg: &Message) -> Result<(), Box<dyn Error>>;
-    async fn recv(&self) -> Result<Message, Box<dyn Error>>;
+    async fn send(&mut self, msg: &Message) -> Result<(), Box<dyn Error>>;
+    async fn recv(&mut self) -> Result<Message, Box<dyn Error>>;
 
     fn close(&self);
     fn addr(&self) -> SocketAddr;

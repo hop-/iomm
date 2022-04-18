@@ -6,13 +6,22 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-tokio = { version = "1.17", features = ["full"] }
+dotenv = "0.15"
 log = { version = "0.4", features = ["max_level_debug", "release_max_level_warn"] }
 env_logger = "0.9"
-dotenv = "0.15"
-quinn = "0.8"
+# async
+tokio = { version = "1.17", features = ["full"] }
 async-trait = "0.1"
 futures-core = "0.3"
-rcgen = "0.9"
+# quic
+quinn = "0.8"
+# tmp for tls
 rustls = "0.20"
+rcgen = "0.9"
+bytes = "1.1"
+# to use Streams
 futures-util = "0.3"
+# serializer
+serde = { version =  "1.0", features = ["derive"] }
+# serialize with json
+serde_json = "1.0"
